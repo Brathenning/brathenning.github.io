@@ -8,11 +8,7 @@ description = "Hello world!"
 
 Ich habe jetzt einen Blog. Ziemlich nice. Danke an https://gearsco.de/blog/blog-in-gleam/ ^^
 
-## Was soll ich bloß schreiben
+## Haus des Meeres
 
-- Liste funktioniert
-- zweiter Eintrag
+Ich war im Haus des Meeres ![Ich im Haus des Meeres](Haus_des_meeres.jpeg Gluck gluck)
 
-1. Aufzählungen
-2. scheinen
-3. auch zu funktionieren
