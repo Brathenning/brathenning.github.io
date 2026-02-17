@@ -51,7 +51,7 @@ pub fn main() -> Nil {
       filepath.join(js_directory, "interactive.js"),
       filepath.join(out_directory, "interactive.js"),
     )
-  let _ = simplifile.delete(out_directory)
+  //let _ = simplifile.delete(js_directory)
   // Write the index page to our file system.
   let assert Ok(Nil) =
     simplifile.write(filepath.join(out_directory, "index.html"), index_page)
@@ -63,7 +63,11 @@ pub fn main() -> Nil {
   })
 
   let feed = build_feed(blog_posts)
-  let assert Ok(Nil) = simplifile.write("feed.xml", rss.to_string([feed]))
+  let assert Ok(Nil) =
+    simplifile.write(
+      filepath.join(out_directory, "feed.xml"),
+      rss.to_string([feed]),
+    )
 
   io.println("Build succeeded!")
 }
