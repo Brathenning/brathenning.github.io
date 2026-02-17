@@ -1,8 +1,8 @@
 /* 1. Base Setup: System fonts and centering */
 :root {
-  --bg: #ffffff;
-  --text: #222222;
-  --accent: #0070f3;
+  --bg: #e8befd;
+  --text: #000000;
+  --accent: #b71cff;
   --code-bg: #f4f4f4;
   --width: 700px;
 }
@@ -44,7 +44,7 @@ blockquote {
   margin: 1.5rem 0;
   padding: 0.5rem 1rem;
   font-style: italic;
-  background: #f9f9f9;
+  background: #ffd7d7;
 }
 
 /* 4. Code Blocks (Very important for tech blogs!) */
