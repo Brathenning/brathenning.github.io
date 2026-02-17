@@ -77,7 +77,11 @@ fn build_feed(blog_posts: List(BlogPost)) -> rss.RssChannel {
       ))
     })
 
-  rss.channel("My Blog", "Blog about interesting stuff", "https://blog.me")
+  rss.channel(
+    "Mein Blog",
+    "Mal schauen, was so drin sein wird",
+    "https://blog.me",
+  )
   |> rss.with_channel_items(items)
 }
 
@@ -91,7 +95,7 @@ fn page(contents: String) -> String {
 // View for our home page.
 fn index(posts: List(BlogPost)) -> element.Element(_) {
   html.main([], [
-    html.h1([], [html.text("Hello, and welcome to my blog!")]),
+    html.h1([], [html.text("Hennis glühender Blog!")]),
     ..list.map(posts, post)
   ])
 }

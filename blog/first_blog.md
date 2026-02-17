@@ -1,7 +1,7 @@
 ---
-title = "First blog"
+title = "Erster Eintrag"
 date = 2026-02-17
-description = "Hello world!"
+description = "Hallo Welt!"
 ---
 
 # Hallo alle!
