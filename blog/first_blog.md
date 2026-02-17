@@ -1,7 +1,7 @@
 ---
-title = "Test post"
+title = "First blog"
 date = 2026-02-17
-description = "A little post to test our system"
+description = "Hello world!"
 ---
 
 # Hallo alle!
