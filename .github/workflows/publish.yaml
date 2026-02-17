@@ -32,7 +32,27 @@ jobs:
           gleam-version: "1.14.0"
           rebar3-version: "3"
 
-      - name: Build Site
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Cache Gleam dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/gleam
+            build
+          key: ${{ runner.os }}-gleam-${{ hashFiles('**/gleam.toml') }}
+
+      - name: Install dependencies
+        run: gleam deps download
+
+      - name: Build Lustre App
+        run: |
+          gleam run -m lustre/dev build --entry interactive --target javascript --out ./priv --minify
+
+      - name: Build Static Site
         run: |
           gleam run
           # Ensure your Gleam app outputs the static HTML into ./priv
