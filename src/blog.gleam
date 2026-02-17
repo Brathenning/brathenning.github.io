@@ -20,6 +20,8 @@ const out_directory = "./priv"
 // Directory containing our static assets
 const static_directory = "./static"
 
+const js_directory = "./build_js"
+
 const blog_directory = "./blog"
 
 type BlogPost {
@@ -44,6 +46,12 @@ pub fn main() -> Nil {
   // Copy all our static assets to the output directory
   let assert Ok(Nil) =
     simplifile.copy_directory(static_directory, out_directory)
+  let assert Ok(Nil) =
+    simplifile.copy_file(
+      filepath.join(js_directory, "interactive.js"),
+      filepath.join(out_directory, "interactive.js"),
+    )
+  let _ = simplifile.delete(out_directory)
   // Write the index page to our file system.
   let assert Ok(Nil) =
     simplifile.write(filepath.join(out_directory, "index.html"), index_page)
@@ -91,7 +99,7 @@ fn page(contents: String) -> String {
     <head>
       <meta charset=\"utf-8\">
       <link rel=\"stylesheet\" href=\"./style.css\" />
-      <script type=\"module\" src=\"./static/interactive.js\"></script>
+      <script type=\"module\" src=\"./interactive.js\"></script>
     </head>
     <body>
       <div class=\"blog-content\">" <> contents <> "</div>
