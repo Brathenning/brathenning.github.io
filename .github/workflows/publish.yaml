@@ -62,6 +62,9 @@ jobs:
         with:
           # This must point to where your static files are
           path: ./priv
+          
+      - name: Debug File Structure
+        run: ls -R ./priv
 
   deploy:
     environment:
