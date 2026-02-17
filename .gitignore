@@ -3,3 +3,6 @@
 /build
 erl_crash.dump
 /priv
+#Added automatically by Lustre Dev Tools
+/.lustre
+/dist

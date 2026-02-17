@@ -90,8 +90,8 @@ fn page(contents: String) -> String {
   <html>
     <head>
       <meta charset=\"utf-8\">
-      <link rel=\"stylesheet\" href=\"/style.css\" />
-      <script type=\"module\" src=\"/static/interactive.js\"></script>
+      <link rel=\"stylesheet\" href=\"./style.css\" />
+      <script type=\"module\" src=\"./static/interactive.js\"></script>
     </head>
     <body>
       <div class=\"blog-content\">" <> contents <> "</div>
