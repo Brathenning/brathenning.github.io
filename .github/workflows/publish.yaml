@@ -50,7 +50,7 @@ jobs:
 
       - name: Build Lustre App
         run: |
-          gleam run -m lustre/dev build interactive --outdir "./priv/static" --minify
+          gleam run -m lustre/dev build interactive --outdir="./priv/static" --minify
 
       - name: Build Static Site
         run: |
