@@ -15,7 +15,7 @@ import tom
 import webls/rss
 
 // Where to output the built website. This can be anywhere you like.
-const out_directory = "./out"
+const out_directory = "./priv"
 
 // Directory containing our static assets
 const static_directory = "./static"
