@@ -37,7 +37,7 @@ type BlogPost {
 
 pub fn main() -> Nil {
   let blog_posts = collect_blog_posts()
-  let index_page = page(element.to_document_string(index(blog_posts)))
+  let index_page = page(element.to_string(index(blog_posts)))
 
   // Delete old output directory to ensure no files are left over
   let _ = simplifile.delete(out_directory)
@@ -105,7 +105,7 @@ fn post(post: BlogPost) -> element.Element(_) {
   let date =
     int.to_string(post.date.day)
     <> " "
-    <> calendar.month_to_string(post.date.month)
+    <> month_to_german(post.date.month, "de")
     <> ", "
     <> int.to_string(post.date.year)
 
@@ -115,6 +115,31 @@ fn post(post: BlogPost) -> element.Element(_) {
     html.span([], [html.text(" - ")]),
     html.span([], [html.text(post.description)]),
   ])
+}
+
+fn month_to_german(month: calendar.Month, lang: String) -> String {
+  case month {
+    calendar.January ->
+      case lang {
+        "at" | "AT" -> "Jänner"
+        _ -> "Januar"
+      }
+    calendar.February ->
+      case lang {
+        "AT" -> "Feber"
+        _ -> "Februar"
+      }
+    calendar.March -> "März"
+    calendar.April -> "April"
+    calendar.May -> "Mai"
+    calendar.June -> "Juni"
+    calendar.July -> "Juli"
+    calendar.August -> "August"
+    calendar.September -> "September"
+    calendar.October -> "Oktober"
+    calendar.November -> "November"
+    calendar.December -> "Dezember"
+  }
 }
 
 fn collect_blog_posts() -> List(BlogPost) {
