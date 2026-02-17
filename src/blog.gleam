@@ -104,9 +104,9 @@ fn post(post: BlogPost) -> element.Element(_) {
   let url = "/" <> post.slug <> ".html"
   let date =
     int.to_string(post.date.day)
-    <> " "
+    <> ". "
     <> month_to_german(post.date.month, "de")
-    <> ", "
+    <> " "
     <> int.to_string(post.date.year)
 
   html.div([], [
