@@ -57,10 +57,12 @@ fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 fn view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div([], [
-      html.button([event.on_click(UserClickedAddCat)], [html.text("Add cat")]),
+      html.button([event.on_click(UserClickedAddCat)], [
+        html.text("MEHR MAUZIS"),
+      ]),
       html.p([], [html.text(int.to_string(model.total))]),
       html.button([event.on_click(UserClickedRemoveCat)], [
-        html.text("Remove cat"),
+        html.text("Bin Hundemensch"),
       ]),
     ]),
     html.div([], {

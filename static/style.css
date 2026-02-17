@@ -32,6 +32,20 @@ a:hover {
   text-decoration: underline;
 }
 
+button {
+  background-color: var(--accent);
+  border:dashed;
+  border-color: #000000;
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: dashed;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
 /* 3. Markdown Elements (Mork Outputs) */
 img {
   max-width: 100%;
