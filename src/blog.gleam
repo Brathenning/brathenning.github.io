@@ -63,7 +63,7 @@ pub fn main() -> Nil {
 fn build_feed(blog_posts: List(BlogPost)) -> rss.RssChannel {
   let items =
     list.map(blog_posts, fn(post) {
-      let url = "https://blog.me/" <> post.slug <> ".html"
+      let url = "https://brathenning.github.io/" <> post.slug <> ".html"
 
       rss.item(post.title, post.description)
       |> rss.with_item_link(url)
