@@ -86,10 +86,19 @@ fn build_feed(blog_posts: List(BlogPost)) -> rss.RssChannel {
 }
 
 fn page(contents: String) -> String {
-  "<!doctype html><html>
-<head><link rel=\"stylesheet\" href=\"/style.css\" /></head>
-<body>" <> contents <> "</body>
-</html>"
+  "<!doctype html>
+  <html>
+    <head>
+      <meta charset=\"utf-8\">
+      <link rel=\"stylesheet\" href=\"/style.css\" />
+      <script type=\"module\" src=\"/static/interactive.js\"></script>
+    </head>
+    <body>
+      <div class=\"blog-content\">" <> contents <> "</div>
+
+      <div id=\"app\"></div>
+    </body>
+  </html>"
 }
 
 // View for our home page.
