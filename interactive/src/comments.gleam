@@ -224,14 +224,16 @@ fn recursive_replies(
         |> list.map(fn(comment) {
           html.div(
             [
-              attribute.style("margin-left", int.to_string({ 20 }) <> "px"),
-              attribute.style(
-                "border-left",
-                "6px "
-                  <> "hsl("
-                  <> int.to_string({ 317 + layer * 30 })
-                  <> ", 100%, 82%)",
-              ),
+              attribute.styles([
+                #("margin-left", int.to_string({ 20 }) <> "px"),
+                #(
+                  "border-left",
+                  "6px "
+                    <> "hsl("
+                    <> int.to_string({ 0 + layer * 30 })
+                    <> ", 100%, 82%)",
+                ),
+              ]),
             ],
             list.append(
               [
@@ -254,7 +256,7 @@ fn recursive_replies(
                     {
                       case current_top {
                         option.None ->
-                          html.p([], [
+                          html.p([attribute.style("padding", "0px")], [
                             html.text(option.unwrap(comment.content, "")),
                           ])
                         _ ->
@@ -262,7 +264,9 @@ fn recursive_replies(
                             html.a([attribute.href("#")], [
                               html.text("@" <> top_name),
                             ]),
-                            html.text(option.unwrap(comment.content, "")),
+                            html.text(
+                              ":\n" <> option.unwrap(comment.content, ""),
+                            ),
                           ])
                       }
                     },

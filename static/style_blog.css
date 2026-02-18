@@ -13,13 +13,13 @@ body {
   color: var(--text);
   background: var(--bg);
   max-width: var(--width);
-  margin: 40px auto;
+  margin: 10px auto;
   padding: 0 20px;
 }
 
 .comment{
   background: var(--code-bg);
-  margin: 40px auto;
+  margin: 20px 20px 20px 0px;
   padding: 0 20px;
 }
 
