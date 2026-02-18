@@ -11,6 +11,7 @@ import gleam/result
 import gleam/time/calendar
 import gleam/time/timestamp
 import gleam/uri
+import modem
 import rsvp
 
 import lustre/attribute
@@ -45,13 +46,18 @@ pub type Model {
     user: String,
     comment: String,
     input_disabled: Bool,
+    current_page: String,
   )
 }
 
 pub fn init(_args) -> #(Model, Effect(Msg)) {
-  let model = Model([], "", "", False)
+  let initial_path =
+    modem.initial_uri()
+    |> result.map(fn(uri) { uri.path })
+    |> result.unwrap("/")
+  let model = Model([], "", "", False, initial_path)
 
-  #(model, get_comment())
+  #(model, get_comment(model))
 }
 
 pub fn create_comment(model: Model) -> Result(Comment, Nil) {
@@ -60,7 +66,7 @@ pub fn create_comment(model: Model) -> Result(Comment, Nil) {
     False ->
       Ok(Comment(
         0,
-        "current_page",
+        model.current_page,
         model.user,
         timestamp.system_time(),
         {
@@ -91,7 +97,13 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     ApiAddedComment(Ok(_)), True ->
       case create_comment(model) {
         Ok(comment) -> #(
-          Model(list.prepend(model.comments, comment), "", "", False),
+          Model(
+            ..model,
+            comments: list.prepend(model.comments, comment),
+            user: "",
+            comment: "",
+            input_disabled: False,
+          ),
           effect.none(),
         )
         _ -> #(model, effect.none())
@@ -244,8 +256,10 @@ fn post_comment(new_comment: Comment) {
   |> rsvp.send(handler)
 }
 
-fn get_comment() {
-  let url = "https://qieprbrymjppuirdahzf.supabase.co/rest/v1/Comments?select=*"
+fn get_comment(model: Model) {
+  let url =
+    "https://qieprbrymjppuirdahzf.supabase.co/rest/v1/Comments?on_page=eq."
+    <> model.current_page
   let assert Ok(uri) = uri.parse(url)
   let handler =
     rsvp.expect_json(decode.list(decode_comment()), ApiReturnedComments)
