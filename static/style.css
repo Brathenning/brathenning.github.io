@@ -34,8 +34,7 @@ a:hover {
 
 button {
   background-color: var(--accent);
-  border:dashed;
-  border-color: #000000;
+  border:2px dotted #ffffff;
   color: white;
   padding: 10px 15px;
   text-align: center;
@@ -44,6 +43,11 @@ button {
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
+}
+
+button:hover {
+  background-color: #7b00b4; 
+  color: white;
 }
 
 /* 3. Markdown Elements (Mork Outputs) */
