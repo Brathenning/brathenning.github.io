@@ -1,3 +1,4 @@
+import gleam/dict
 import gleam/dynamic
 import gleam/dynamic/decode
 import gleam/http
@@ -38,6 +39,7 @@ pub type Msg {
   UserEnteredName(String)
   UserEnteredComment(String)
   UserResetComment
+  UserRepliedComment(Int)
 }
 
 pub type Model {
@@ -47,6 +49,7 @@ pub type Model {
     comment: String,
     input_disabled: Bool,
     current_page: String,
+    reply_to: Int,
   )
 }
 
@@ -55,7 +58,7 @@ pub fn init(_args) -> #(Model, Effect(Msg)) {
     modem.initial_uri()
     |> result.map(fn(uri) { uri.path })
     |> result.unwrap("/")
-  let model = Model([], "", "", False, initial_path)
+  let model = Model([], "", "", False, initial_path, 0)
 
   #(model, get_comment(model))
 }
@@ -64,19 +67,26 @@ pub fn create_comment(model: Model) -> Result(Comment, Nil) {
   case model.user == "" {
     True -> Error(Nil)
     False ->
-      Ok(Comment(
-        0,
-        model.current_page,
-        model.user,
-        timestamp.system_time(),
-        {
-          case model.comment {
-            "" -> option.None
-            content -> option.Some(content)
-          }
-        },
-        option.None,
-      ))
+      Ok(
+        Comment(
+          0,
+          model.current_page,
+          model.user,
+          timestamp.system_time(),
+          {
+            case model.comment {
+              "" -> option.None
+              content -> option.Some(content)
+            }
+          },
+          {
+            case model.reply_to {
+              0 -> option.None
+              id -> option.Some(id)
+            }
+          },
+        ),
+      )
   }
 }
 
@@ -89,9 +99,21 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           post_comment(comment),
         )
         Error(Nil) -> #(
-          Model(..model, user: "must not be empty"),
+          Model(..model, user: "must not be empty", reply_to: 0),
           effect.none(),
         )
+      }
+
+    UserRepliedComment(id), False ->
+      case id {
+        0 -> #(
+          Model(
+            ..model,
+            comment: "reload page before replying\n" <> model.comment,
+          ),
+          effect.none(),
+        )
+        _ -> update(Model(..model, reply_to: id), UserClickedAddComment)
       }
 
     ApiAddedComment(Ok(_)), True ->
@@ -103,6 +125,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
             user: "",
             comment: "",
             input_disabled: False,
+            reply_to: 0,
           ),
           effect.none(),
         )
@@ -110,7 +133,12 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
 
     ApiAddedComment(Error(_)), True -> #(
-      Model(..model, comment: "Error posting to Api", input_disabled: False),
+      Model(
+        ..model,
+        comment: "Error posting to Api",
+        input_disabled: False,
+        reply_to: 0,
+      ),
       effect.none(),
     )
 
@@ -130,6 +158,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       Model(..model, user: "", comment: ""),
       effect.none(),
     )
+
     _, _ -> #(model, effect.none())
   }
 }
@@ -159,32 +188,77 @@ pub fn view(model: Model) -> Element(Msg) {
       ]),
       html.div([], [
         html.button([event.on_click(UserClickedAddComment)], [
-          html.text("Comment"),
+          html.text("Kommentieren"),
         ]),
-        html.button([event.on_click(UserResetComment)], [html.text("Clear")]),
+        html.button([event.on_click(UserResetComment)], [html.text("Leer")]),
       ]),
     ]),
-    html.div([], {
-      list.sort(model.comments, fn(com_a, com_b) {
-        timestamp.compare(com_a.created_at, com_b.created_at)
-      })
-      |> list.map(fn(comment) {
-        html.div([], [
-          html.span([], [html.text(comment.by_user)]),
-          html.span([], [html.text(" - ")]),
-          html.span([], [
-            html.text(
-              timestamp.to_calendar(comment.created_at, calendar.utc_offset).0
-              |> format_date,
-            ),
-          ]),
-          html.p([], [
-            html.text(option.unwrap(comment.content, "")),
-          ]),
-        ])
-      })
-    }),
+    html.div(
+      [],
+      recursive_replies(
+        list.group(model.comments, fn(comment) { comment.reply_to }),
+        option.None,
+        "",
+        0,
+      ),
+    ),
   ])
+}
+
+fn recursive_replies(
+  comments_dict: dict.Dict(option.Option(Int), List(Comment)),
+  current_top: option.Option(Int),
+  top_name: String,
+  layer: Int,
+) -> List(Element(Msg)) {
+  {
+    comments_dict
+    |> dict.get(current_top)
+    |> result.unwrap([])
+    |> list.sort(fn(com_a, com_b) {
+      timestamp.compare(com_a.created_at, com_b.created_at)
+    })
+    |> list.map(fn(comment) {
+      html.div(
+        [attribute.style("margin-left", int.to_string({ layer * 20 }) <> "px")],
+        list.append(
+          [
+            html.span([], [html.text(comment.by_user)]),
+            html.span([], [html.text(" - ")]),
+            html.span([], [
+              html.text(
+                timestamp.to_calendar(comment.created_at, calendar.utc_offset).0
+                |> format_date,
+              ),
+            ]),
+            {
+              case current_top {
+                option.None ->
+                  html.p([], [
+                    html.text(option.unwrap(comment.content, "")),
+                  ])
+                _ ->
+                  html.p([], [
+                    html.a([attribute.href("#")], [html.text("@" <> top_name)]),
+                    html.text(option.unwrap(comment.content, "")),
+                  ])
+              }
+            },
+
+            html.button([event.on_click(UserRepliedComment(comment.id))], [
+              html.text("Reply"),
+            ]),
+          ],
+          recursive_replies(
+            comments_dict,
+            option.Some(comment.id),
+            comment.by_user,
+            layer + 1,
+          ),
+        ),
+      )
+    })
+  }
 }
 
 fn format_date(comment_date: calendar.Date) -> String {
