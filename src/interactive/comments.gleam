@@ -184,7 +184,12 @@ fn post_comment(new_comment: Comment) {
     "apikey",
     "sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
   )
+  |> request.set_header(
+    "Authorization",
+    "Bearer sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
+  )
   |> request.set_header("content-type", "application/json")
+  |> request.set_header("Prefer", "return=minimal")
   |> request.set_method(http.Post)
   |> request.set_body(json.to_string(body))
   |> echo
@@ -192,7 +197,7 @@ fn post_comment(new_comment: Comment) {
 }
 
 fn get_comment() {
-  let url = "https://qieprbrymjppuirdahzf.supabase.co/rest/v1/Comments"
+  let url = "https://qieprbrymjppuirdahzf.supabase.co/rest/v1/Comments?select=*"
   let assert Ok(uri) = uri.parse(url)
   let handler =
     rsvp.expect_json(decode.list(decode_comment()), ApiReturnedComments)
@@ -203,7 +208,10 @@ fn get_comment() {
     "apikey",
     "sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
   )
-  |> request.set_header("content-type", "application/json")
+  |> request.set_header(
+    "Authorization",
+    "Bearer sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
+  )
   |> request.set_method(http.Get)
   |> echo
   |> rsvp.send(handler)
