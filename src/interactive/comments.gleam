@@ -245,7 +245,7 @@ fn recursive_replies(
               }
             },
 
-            html.button([event.on_click(UserRepliedComment(comment.id))], [
+            html.button([event.on_click(UserRepliedComment(4))], [
               html.text("Antworten auf " <> int.to_string(comment.id)),
             ]),
           ],
