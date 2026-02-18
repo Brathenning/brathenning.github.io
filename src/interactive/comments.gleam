@@ -184,6 +184,7 @@ fn post_comment(new_comment: Comment) {
     "apikey",
     "sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
   )
+  |> request.set_header("content-type", "application/json")
   |> request.set_method(http.Post)
   |> request.set_body(json.to_string(body))
   |> echo
@@ -202,6 +203,7 @@ fn get_comment() {
     "apikey",
     "sb_publishable_X0MlBjjgRgM75O4CCKv5Rg_XLAnssQZ",
   )
+  |> request.set_header("content-type", "application/json")
   |> request.set_method(http.Get)
   |> echo
   |> rsvp.send(handler)
