@@ -12,7 +12,9 @@ import gleam/result
 import gleam/time/calendar
 import gleam/time/timestamp
 import gleam/uri
+
 import modem
+import plinth/browser/window
 import rsvp
 
 import lustre/attribute
@@ -49,7 +51,7 @@ pub type Model {
     comment: String,
     input_disabled: Bool,
     current_page: String,
-    reply_to: Int,
+    reply_to: option.Option(Int),
   )
 }
 
@@ -58,7 +60,7 @@ pub fn init(_args) -> #(Model, Effect(Msg)) {
     modem.initial_uri()
     |> result.map(fn(uri) { uri.path })
     |> result.unwrap("/")
-  let model = Model([], "", "", False, initial_path, 0)
+  let model = Model([], "", "", False, initial_path, option.None)
 
   #(model, get_comment(model))
 }
@@ -67,26 +69,19 @@ pub fn create_comment(model: Model) -> Result(Comment, Nil) {
   case model.user == "" {
     True -> Error(Nil)
     False ->
-      Ok(
-        Comment(
-          model.reply_to,
-          model.current_page,
-          model.user,
-          timestamp.system_time(),
-          {
-            case model.comment {
-              "" -> option.None
-              content -> option.Some(content)
-            }
-          },
-          {
-            case model.reply_to {
-              0 -> option.None
-              id -> option.Some(id)
-            }
-          },
-        ),
-      )
+      Ok(Comment(
+        0,
+        model.current_page,
+        model.user,
+        timestamp.system_time(),
+        {
+          case model.comment {
+            "" -> option.None
+            content -> option.Some(content)
+          }
+        },
+        model.reply_to,
+      ))
   }
 }
 
@@ -99,12 +94,13 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           post_comment(comment),
         )
         Error(Nil) -> #(
-          Model(..model, user: "must not be empty", reply_to: 0),
+          Model(..model, user: "must not be empty", reply_to: option.None),
           effect.none(),
         )
       }
 
-    UserRepliedComment(id), False ->
+    UserRepliedComment(id), False -> {
+      window.alert("Clicking ID: " <> int.to_string(id))
       case id {
         0 -> #(
           Model(
@@ -113,8 +109,13 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           ),
           effect.none(),
         )
-        _ -> update(Model(..model, reply_to: id), UserClickedAddComment)
+        _ ->
+          update(
+            Model(..model, reply_to: option.Some(id)),
+            UserClickedAddComment,
+          )
       }
+    }
 
     ApiAddedComment(Ok(_)), True ->
       case create_comment(model) {
@@ -125,7 +126,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
             user: "",
             comment: "",
             input_disabled: False,
-            reply_to: 0,
+            reply_to: option.None,
           ),
           effect.none(),
         )
@@ -137,7 +138,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         ..model,
         comment: "Error posting to Api",
         input_disabled: False,
-        reply_to: 0,
+        reply_to: option.None,
       ),
       effect.none(),
     )
@@ -258,7 +259,7 @@ fn recursive_replies(
                   }
                 },
 
-                html.button([event.on_click(UserRepliedComment(4))], [
+                html.button([event.on_click(UserRepliedComment(comment.id))], [
                   html.text("Antworten auf " <> int.to_string(comment.id)),
                 ]),
               ],
