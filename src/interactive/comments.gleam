@@ -126,9 +126,17 @@ pub fn view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div([], [
       html.div([], [
+        html.p([], [
+          html.text("Name:"),
+        ]),
         html.input([
           attribute.value(model.user),
           event.on_input(UserEnteredName),
+        ]),
+      ]),
+      html.div([], [
+        html.p([], [
+          html.text("Kommentar:"),
         ]),
         html.input([
           attribute.value(model.comment),
