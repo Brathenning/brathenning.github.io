@@ -1,7 +1,7 @@
 ---
-title = "Titel"
-date = YYYY-MM-DD
-description = "Beschreibung"
+title = "Alles Gute zum Geburtstag"
+date = 2026-02-18
+description = "Papa wird älter"
 ---
 
 # Alles Gute zum Geburtstag, lieber Papa!
