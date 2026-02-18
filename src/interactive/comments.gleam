@@ -166,9 +166,9 @@ pub fn view(model: Model) -> Element(Msg) {
               calendar.utc_offset,
             )),
           ]),
-        ])
-        html.p([], [
-          html.text(option.unwrap(comment.content, "")),
+          html.p([], [
+            html.text(option.unwrap(comment.content, "")),
+          ]),
         ])
       })
     }),
