@@ -143,14 +143,19 @@ pub fn view(model: Model) -> Element(Msg) {
       ]),
     ]),
     html.div([], {
-      list.map(model.comments, fn(comment) {
-        html.span([], [html.text(comment.by_user)])
-        html.span([], [html.text("-")])
-        html.span([], [
-          html.text(timestamp.to_rfc3339(
-            comment.created_at,
-            calendar.utc_offset,
-          )),
+      list.sort(model.comments, fn(com_a, com_b) {
+        timestamp.compare(com_a.created_at, com_b.created_at)
+      })
+      |> list.map(fn(comment) {
+        html.div([], [
+          html.span([], [html.text(comment.by_user)]),
+          html.span([], [html.text("-")]),
+          html.span([], [
+            html.text(timestamp.to_rfc3339(
+              comment.created_at,
+              calendar.utc_offset,
+            )),
+          ]),
         ])
         html.p([], [
           html.text(option.unwrap(comment.content, "")),
