@@ -100,7 +100,6 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
       }
 
     UserRepliedComment(id), False -> {
-      window.alert("Clicking ID: " <> int.to_string(id))
       case id {
         0 -> #(
           Model(
@@ -225,43 +224,56 @@ fn recursive_replies(
         |> list.map(fn(comment) {
           html.div(
             [
-              attribute.style(
-                "margin-left",
-                int.to_string({ layer * 20 }) <> "px",
-              ),
+              attribute.style("margin-left", int.to_string({ 20 }) <> "px"),
+              attribute.style("border-left", "6px"),
             ],
             list.append(
               [
-                html.span([], [html.text(comment.by_user)]),
-                html.span([], [html.text(" - ")]),
-                html.span([], [
-                  html.text(
-                    timestamp.to_calendar(
-                      comment.created_at,
-                      calendar.utc_offset,
-                    ).0
-                    |> format_date,
-                  ),
-                ]),
-                {
-                  case current_top {
-                    option.None ->
-                      html.p([], [
-                        html.text(option.unwrap(comment.content, "")),
-                      ])
-                    _ ->
-                      html.p([], [
-                        html.a([attribute.href("#")], [
-                          html.text("@" <> top_name),
-                        ]),
-                        html.text(option.unwrap(comment.content, "")),
-                      ])
-                  }
-                },
+                html.div(
+                  [
+                    attribute.style(
+                      "background",
+                      "hsl("
+                        <> int.to_string({ 317 + layer * 10 })
+                        <> ", 100%, 82%)",
+                    ),
+                  ],
+                  [
+                    html.span([], [html.text(comment.by_user)]),
+                    html.span([], [html.text(" - ")]),
+                    html.span([], [
+                      html.text(
+                        timestamp.to_calendar(
+                          comment.created_at,
+                          calendar.utc_offset,
+                        ).0
+                        |> format_date,
+                      ),
+                    ]),
+                    {
+                      case current_top {
+                        option.None ->
+                          html.p([], [
+                            html.text(option.unwrap(comment.content, "")),
+                          ])
+                        _ ->
+                          html.p([], [
+                            html.a([attribute.href("#")], [
+                              html.text("@" <> top_name),
+                            ]),
+                            html.text(option.unwrap(comment.content, "")),
+                          ])
+                      }
+                    },
 
-                html.button([event.on_click(UserRepliedComment(comment.id))], [
-                  html.text("Antworten auf " <> int.to_string(comment.id)),
-                ]),
+                    html.button(
+                      [event.on_click(UserRepliedComment(comment.id))],
+                      [
+                        html.text("Antworten"),
+                      ],
+                    ),
+                  ],
+                ),
               ],
               recursive_replies(
                 comments_dict,
