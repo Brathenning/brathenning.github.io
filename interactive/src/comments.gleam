@@ -225,18 +225,19 @@ fn recursive_replies(
           html.div(
             [
               attribute.style("margin-left", int.to_string({ 20 }) <> "px"),
-              attribute.style("border-left", "6px"),
+              attribute.style(
+                "border-left",
+                "6px "
+                  <> "hsl("
+                  <> int.to_string({ 317 + layer * 30 })
+                  <> ", 100%, 82%)",
+              ),
             ],
             list.append(
               [
                 html.div(
                   [
-                    attribute.style(
-                      "background",
-                      "hsl("
-                        <> int.to_string({ 317 + layer * 10 })
-                        <> ", 100%, 82%)",
-                    ),
+                    attribute.class("comments"),
                   ],
                   [
                     html.span([], [html.text(comment.by_user)]),

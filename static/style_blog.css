@@ -17,6 +17,12 @@ body {
   padding: 0 20px;
 }
 
+.comment{
+  background: var(--code-bg);
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
 /* 2. Typography */
 h1, h2, h3 {
   line-height: 1.2;
