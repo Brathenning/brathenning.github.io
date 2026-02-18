@@ -237,7 +237,7 @@ fn recursive_replies(
               [
                 html.div(
                   [
-                    attribute.class("comments"),
+                    attribute.class("comment"),
                   ],
                   [
                     html.span([], [html.text(comment.by_user)]),
