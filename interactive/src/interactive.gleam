@@ -1,5 +1,5 @@
-import interactive/cats
-import interactive/comments
+import cats
+import comments
 import lustre
 
 pub fn main() {

@@ -50,10 +50,12 @@ jobs:
 
       - name: Build Lustre App
         run: |
-          gleam run -m lustre/dev build interactive/interactive --outdir="./build_js" --minify
+          cd interactive
+          gleam run -m lustre/dev build interactive/interactive --outdir="../build_js" --minify
 
       - name: Build Static Site
         run: |
+          cd build_static
           gleam run
           # Ensure your Gleam app outputs the static HTML into ./priv
 
