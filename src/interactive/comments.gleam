@@ -159,12 +159,12 @@ pub fn view(model: Model) -> Element(Msg) {
       |> list.map(fn(comment) {
         html.div([], [
           html.span([], [html.text(comment.by_user)]),
-          html.span([], [html.text("-")]),
+          html.span([], [html.text(" - ")]),
           html.span([], [
-            html.text(timestamp.to_rfc3339(
-              comment.created_at,
-              calendar.utc_offset,
-            )),
+            html.text(
+              timestamp.to_calendar(comment.created_at, calendar.utc_offset).0
+              |> format_date,
+            ),
           ]),
           html.p([], [
             html.text(option.unwrap(comment.content, "")),
@@ -173,6 +173,39 @@ pub fn view(model: Model) -> Element(Msg) {
       })
     }),
   ])
+}
+
+fn format_date(comment_date: calendar.Date) -> String {
+  int.to_string(comment_date.day)
+  <> ". "
+  <> month_to_german(comment_date.month, "de")
+  <> " "
+  <> int.to_string(comment_date.year)
+}
+
+fn month_to_german(month: calendar.Month, lang: String) -> String {
+  case month {
+    calendar.January ->
+      case lang {
+        "at" | "AT" -> "Jänner"
+        _ -> "Januar"
+      }
+    calendar.February ->
+      case lang {
+        "AT" -> "Feber"
+        _ -> "Februar"
+      }
+    calendar.March -> "März"
+    calendar.April -> "April"
+    calendar.May -> "Mai"
+    calendar.June -> "Juni"
+    calendar.July -> "Juli"
+    calendar.August -> "August"
+    calendar.September -> "September"
+    calendar.October -> "Oktober"
+    calendar.November -> "November"
+    calendar.December -> "Dezember"
+  }
 }
 
 fn post_comment(new_comment: Comment) {
