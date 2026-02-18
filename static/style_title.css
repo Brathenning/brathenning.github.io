@@ -1,0 +1,105 @@
+/* 1. Base Setup: System fonts and centering */
+:root {
+  --bg: #e8befd;
+  --text: #000000;
+  --accent: #b71cff;
+  --code-bg: #f4f4f4;
+  --width: 700px;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  max-width: var(--width);
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* 2. Typography */
+h1, h2, h3 {
+  line-height: 1.2;
+  margin-top: 2rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  background-color: var(--accent);
+  border:2px dotted #ffffff;
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: dashed;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+button:hover {
+  background-color: #7b00b4; 
+  color: white;
+}
+
+/* 3. Markdown Elements (Mork Outputs) */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  margin: 1.5rem 0;
+  padding: 0.5rem 1rem;
+  font-style: italic;
+  background: #ffd7d7;
+}
+
+/* 4. Code Blocks (Very important for tech blogs!) */
+pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 5px;
+}
+
+code {
+  font-family: 'Courier New', Courier, monospace;
+  background: var(--code-bg);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+/* 5. Lists & Tables */
+ul, ol {
+  margin-bottom: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}

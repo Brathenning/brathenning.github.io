@@ -39,7 +39,7 @@ type BlogPost {
 
 pub fn main() -> Nil {
   let blog_posts = collect_blog_posts()
-  let index_page = page(element.to_string(index(blog_posts)))
+  let index_page = title_page(element.to_string(index(blog_posts)))
 
   // Delete old output directory to ensure no files are left over
   let _ = simplifile.delete(out_directory)
@@ -59,7 +59,7 @@ pub fn main() -> Nil {
   list.each(blog_posts, fn(post) {
     let path = filepath.join(out_directory, post.slug <> ".html")
 
-    let assert Ok(Nil) = simplifile.write(path, page(post.contents))
+    let assert Ok(Nil) = simplifile.write(path, blog_page(post.contents))
   })
 
   let feed = build_feed(blog_posts)
@@ -97,18 +97,35 @@ fn build_feed(blog_posts: List(BlogPost)) -> rss.RssChannel {
   |> rss.with_channel_items(items)
 }
 
-fn page(contents: String) -> String {
+fn title_page(contents: String) -> String {
   "<!doctype html>
   <html>
     <head>
       <meta charset=\"utf-8\">
-      <link rel=\"stylesheet\" href=\"./style.css\" />
+      <link rel=\"stylesheet\" href=\"./style_title.css\" />
       <script type=\"module\" src=\"./interactive.js\"></script>
     </head>
     <body>
       <div class=\"blog-content\">" <> contents <> "</div>
 
-      <div id=\"app\"></div>
+      <div id=\"cat\"></div>
+    </body>
+  </html>"
+}
+
+fn blog_page(contents: String) -> String {
+  "<!doctype html>
+  <html>
+    <head>
+      <meta charset=\"utf-8\">
+      <link rel=\"stylesheet\" href=\"./style_blog.css\" />
+      <script type=\"module\" src=\"./interactive.js\"></script>
+    </head>
+    <body>
+      <div class=\"blog-content\">" <> contents <> "</div>
+
+      <div id=\"comment\"></div>
+      <div id=\"cat\"></div>
     </body>
   </html>"
 }
