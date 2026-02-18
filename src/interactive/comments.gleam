@@ -138,10 +138,12 @@ pub fn view(model: Model) -> Element(Msg) {
         html.p([], [
           html.text("Kommentar:"),
         ]),
-        html.input([
-          attribute.value(model.comment),
-          event.on_input(UserEnteredComment),
-        ]),
+        html.textarea(
+          [
+            event.on_input(UserEnteredComment),
+          ],
+          model.comment,
+        ),
       ]),
       html.div([], [
         html.button([event.on_click(UserClickedAddComment)], [
