@@ -212,52 +212,66 @@ fn recursive_replies(
   layer: Int,
 ) -> List(Element(Msg)) {
   {
-    comments_dict
-    |> dict.get(current_top)
-    |> result.unwrap([])
-    |> list.sort(fn(com_a, com_b) {
-      timestamp.compare(com_a.created_at, com_b.created_at)
-    })
-    |> list.map(fn(comment) {
-      html.div(
-        [attribute.style("margin-left", int.to_string({ layer * 20 }) <> "px")],
-        list.append(
-          [
-            html.span([], [html.text(comment.by_user)]),
-            html.span([], [html.text(" - ")]),
-            html.span([], [
-              html.text(
-                timestamp.to_calendar(comment.created_at, calendar.utc_offset).0
-                |> format_date,
+    case
+      comments_dict
+      |> dict.get(current_top)
+    {
+      Error(_) -> []
+      Ok(current_comments) ->
+        list.sort(current_comments, fn(com_a, com_b) {
+          timestamp.compare(com_a.created_at, com_b.created_at)
+        })
+        |> list.map(fn(comment) {
+          html.div(
+            [
+              attribute.style(
+                "margin-left",
+                int.to_string({ layer * 20 }) <> "px",
               ),
-            ]),
-            {
-              case current_top {
-                option.None ->
-                  html.p([], [
-                    html.text(option.unwrap(comment.content, "")),
-                  ])
-                _ ->
-                  html.p([], [
-                    html.a([attribute.href("#")], [html.text("@" <> top_name)]),
-                    html.text(option.unwrap(comment.content, "")),
-                  ])
-              }
-            },
+            ],
+            list.append(
+              [
+                html.span([], [html.text(comment.by_user)]),
+                html.span([], [html.text(" - ")]),
+                html.span([], [
+                  html.text(
+                    timestamp.to_calendar(
+                      comment.created_at,
+                      calendar.utc_offset,
+                    ).0
+                    |> format_date,
+                  ),
+                ]),
+                {
+                  case current_top {
+                    option.None ->
+                      html.p([], [
+                        html.text(option.unwrap(comment.content, "")),
+                      ])
+                    _ ->
+                      html.p([], [
+                        html.a([attribute.href("#")], [
+                          html.text("@" <> top_name),
+                        ]),
+                        html.text(option.unwrap(comment.content, "")),
+                      ])
+                  }
+                },
 
-            html.button([event.on_click(UserRepliedComment(4))], [
-              html.text("Antworten auf " <> int.to_string(comment.id)),
-            ]),
-          ],
-          recursive_replies(
-            comments_dict,
-            option.Some(comment.id),
-            comment.by_user,
-            layer + 1,
-          ),
-        ),
-      )
-    })
+                html.button([event.on_click(UserRepliedComment(4))], [
+                  html.text("Antworten auf " <> int.to_string(comment.id)),
+                ]),
+              ],
+              recursive_replies(
+                comments_dict,
+                option.Some(comment.id),
+                comment.by_user,
+                layer + 1,
+              ),
+            ),
+          )
+        })
+    }
   }
 }
 
