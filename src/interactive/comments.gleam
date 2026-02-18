@@ -69,7 +69,7 @@ pub fn create_comment(model: Model) -> Result(Comment, Nil) {
     False ->
       Ok(
         Comment(
-          0,
+          model.reply_to,
           model.current_page,
           model.user,
           timestamp.system_time(),
@@ -246,7 +246,7 @@ fn recursive_replies(
             },
 
             html.button([event.on_click(UserRepliedComment(comment.id))], [
-              html.text("Reply"),
+              html.text("Antworten auf " <> int.to_string(comment.id)),
             ]),
           ],
           recursive_replies(
