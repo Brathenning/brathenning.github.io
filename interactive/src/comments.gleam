@@ -225,14 +225,28 @@ fn recursive_replies(
           html.div(
             [
               attribute.styles([
-                #("margin-left", int.to_string({ 20 }) <> "px"),
                 #(
-                  "border-left",
-                  "6px "
-                    <> "hsl("
-                    <> int.to_string({ 0 + layer * 30 })
-                    <> ", 100%, 82%)",
+                  "margin-left",
+                  int.to_string({
+                    case layer {
+                      0 -> 0
+                      _ -> 20
+                    }
+                  })
+                    <> "px",
                 ),
+                {
+                  case layer {
+                    0 -> #("", "")
+                    _ -> #(
+                      "border-left",
+                      "6px "
+                        <> "hsl("
+                        <> int.to_string({ 0 + layer * 30 })
+                        <> ", 100%, 82%)",
+                    )
+                  }
+                },
               ]),
             ],
             list.append(
