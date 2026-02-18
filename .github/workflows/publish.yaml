@@ -42,11 +42,14 @@ jobs:
         with:
           path: |
             ~/.cache/gleam
-            build
+            build_static/build
+            interactive/build
           key: ${{ runner.os }}-gleam-${{ hashFiles('**/gleam.toml') }}
 
       - name: Install dependencies
-        run: gleam deps download
+        run: |
+          cd build_static && gleam deps download
+          cd ../interactive && gleam deps download
 
       - name: Build Lustre App
         run: |
