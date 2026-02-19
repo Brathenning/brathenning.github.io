@@ -165,71 +165,67 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
 }
 
 pub fn view(model: Model) -> Element(Msg) {
+  html.div([], {
+    case model.reply_to {
+      option.None -> [
+        enter_comment(model),
+        html.div(
+          [],
+          recursive_replies(
+            model,
+            list.group(model.comments, fn(comment) { comment.reply_to }),
+            option.None,
+            "",
+            0,
+          ),
+        ),
+      ]
+      option.Some(_) -> [
+        html.div(
+          [],
+          recursive_replies(
+            model,
+            list.group(model.comments, fn(comment) { comment.reply_to }),
+            option.None,
+            "",
+            0,
+          ),
+        ),
+      ]
+    }
+  })
+}
+
+fn enter_comment(model: Model) -> Element(Msg) {
   html.div([], [
     html.div([], [
-      html.div([], [
-        html.p([], [
+      html.p(
+        [
+          attribute.styles([#("padding", "0px"), #("margin", "0px")]),
+        ],
+        [
           html.text("Name:"),
-        ]),
-        html.input([
-          attribute.value(model.user),
-          event.on_input(UserEnteredName),
-        ]),
-      ]),
-      html.div([], [
-        html.p([], [
-          html.text("Kommentar:"),
-        ]),
-        html.textarea(
-          [
-            event.on_input(UserEnteredComment),
-            attribute.styles({
-              [
-                #("rows", "6"),
-                #("cols", "50"),
-              ]
-            }),
-          ],
-          model.comment,
-        ),
-      ]),
-      html.div([], [
-        html.button([event.on_click(UserClickedAddComment)], [
-          html.text("Kommentieren"),
-        ]),
-        html.button([event.on_click(UserResetComment)], [html.text("Leer")]),
+        ],
+      ),
+      html.input([
+        attribute.value(model.user),
+        event.on_input(UserEnteredName),
       ]),
     ]),
-    html.div(
-      [],
-      recursive_replies(
-        list.group(model.comments, fn(comment) { comment.reply_to }),
-        option.None,
-        "",
-        0,
-      ),
-    ),
+    html.div([], [
+      html.button([event.on_click(UserClickedAddComment)], [
+        html.text("Kommentieren"),
+      ]),
+      html.button([event.on_click(UserResetComment)], [html.text("Leer")]),
+    ]),
   ])
 }
 
 fn outer_div_attributes(layer: Int) -> List(attribute.Attribute(Msg)) {
   case layer {
     0 -> []
-    1 -> [
-      attribute.styles([
-        #("padding-left", int.to_string(10) <> "px"),
-        #(
-          "border-left",
-          "6px solid "
-            <> "hsl("
-            <> int.to_string({ 0 + layer * 30 })
-            <> ", 100%, 82%)",
-        ),
-      ]),
-    ]
     _ -> [
       attribute.styles([
-        #("margin-left", int.to_string(10) <> "px"),
         #("padding-left", int.to_string(10) <> "px"),
         #(
           "border-left",
@@ -261,49 +257,7 @@ fn comment_div(
           |> format_date,
         ),
       ]),
-      html.div([], {
-        let p_comments = case
-          option.unwrap(comment.content, "")
-          |> string.split_once("\n")
-        {
-          Ok(#(first, rest)) -> #(
-            first,
-            rest
-              |> string.split("\n")
-              |> list.map(fn(content_split) {
-                html.p(
-                  [
-                    attribute.styles([#("padding", "0px"), #("margin", "0px")]),
-                  ],
-                  [
-                    html.text(content_split),
-                  ],
-                )
-              }),
-          )
-          Error(_) -> #(option.unwrap(comment.content, ""), [])
-        }
-        case current_top {
-          option.None ->
-            html.p(
-              [attribute.styles([#("padding", "0px"), #("margin", "0px")])],
-              [
-                html.text(p_comments.0),
-              ],
-            )
-          _ ->
-            html.p(
-              [attribute.styles([#("padding", "0px"), #("margin", "0px")])],
-              [
-                html.a([attribute.href("#")], [
-                  html.text("@" <> top_name),
-                ]),
-                html.text(": " <> p_comments.0),
-              ],
-            )
-        }
-        |> list.prepend(p_comments.1, _)
-      }),
+      html.div([], p_list(comment, current_top, top_name)),
 
       html.button([event.on_click(UserRepliedComment(comment.id))], [
         html.text("Antworten"),
@@ -312,7 +266,50 @@ fn comment_div(
   )
 }
 
+fn p_list(
+  comment: Comment,
+  current_top: option.Option(Int),
+  top_name: String,
+) -> List(Element(Msg)) {
+  let p_comments = case
+    option.unwrap(comment.content, "")
+    |> string.split_once("\n")
+  {
+    Ok(#(first, rest)) -> #(
+      first,
+      rest
+        |> string.split("\n")
+        |> list.map(fn(content_split) {
+          html.p(
+            [
+              attribute.styles([#("padding", "0px"), #("margin", "0px")]),
+            ],
+            [
+              html.text(content_split),
+            ],
+          )
+        }),
+    )
+    Error(_) -> #(option.unwrap(comment.content, ""), [])
+  }
+  case current_top {
+    option.None ->
+      html.p([attribute.styles([#("padding", "0px"), #("margin", "0px")])], [
+        html.text(p_comments.0),
+      ])
+    _ ->
+      html.p([attribute.styles([#("padding", "0px"), #("margin", "0px")])], [
+        html.a([attribute.href("#")], [
+          html.text("@" <> top_name),
+        ]),
+        html.text(": " <> p_comments.0),
+      ])
+  }
+  |> list.prepend(p_comments.1, _)
+}
+
 fn recursive_replies(
+  model: Model,
   comments_dict: dict.Dict(option.Option(Int), List(Comment)),
   current_top: option.Option(Int),
   top_name: String,
@@ -328,23 +325,41 @@ fn recursive_replies(
         [
           html.div(
             outer_div_attributes(layer),
-            list.sort(current_comments, fn(com_a, com_b) {
+            list.sort(current_comments, fn(com_b, com_a) {
               timestamp.compare(com_a.created_at, com_b.created_at)
             })
               |> list.map(fn(comment) {
                 case
                   recursive_replies(
+                    model,
                     comments_dict,
                     option.Some(comment.id),
                     comment.by_user,
                     layer + 1,
                   )
                 {
-                  [] -> comment_div(comment, current_top, top_name)
+                  [] ->
+                    case model.reply_to {
+                      option.Some(x) if x == comment.id ->
+                        html.div([], [
+                          comment_div(comment, current_top, top_name),
+                          enter_comment(model),
+                        ])
+                      _ -> comment_div(comment, current_top, top_name)
+                    }
                   sub_comments ->
                     html.div(
                       [],
-                      [comment_div(comment, current_top, top_name)]
+                      [
+                        case model.reply_to {
+                          option.Some(x) if x == comment.id ->
+                            html.div([], [
+                              comment_div(comment, current_top, top_name),
+                              enter_comment(model),
+                            ])
+                          _ -> comment_div(comment, current_top, top_name)
+                        },
+                      ]
                         |> list.append(sub_comments),
                     )
                 }
