@@ -223,32 +223,23 @@ fn recursive_replies(
         })
         |> list.map(fn(comment) {
           html.div(
-            [
-              attribute.styles([
-                #(
-                  "margin-left",
-                  int.to_string({
-                    case layer {
-                      0 -> 0
-                      _ -> 20
-                    }
-                  })
-                    <> "px",
-                ),
-                {
-                  case layer {
-                    0 -> #("", "")
-                    _ -> #(
+            {
+              case layer {
+                0 -> []
+                _ -> [
+                  attribute.styles([
+                    #("margin-left", int.to_string(20) <> "px"),
+                    #(
                       "border-left",
                       "6px "
                         <> "hsl("
                         <> int.to_string({ 0 + layer * 30 })
                         <> ", 100%, 82%)",
-                    )
-                  }
-                },
-              ]),
-            ],
+                    ),
+                  ]),
+                ]
+              }
+            },
             list.append(
               [
                 html.div(
