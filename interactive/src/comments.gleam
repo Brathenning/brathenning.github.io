@@ -209,6 +209,27 @@ fn enter_comment(model: Model) -> Element(Msg) {
       ]),
     ]),
     html.div([], [
+      html.p(
+        [
+          attribute.styles([#("padding", "0px"), #("margin", "0px")]),
+        ],
+        [
+          html.text("Kommentar:"),
+        ],
+      ),
+      html.textarea(
+        [
+          attribute.value(model.user),
+          attribute.styles([
+            #("width", "100%"),
+            #("height", "50px"),
+          ]),
+          event.on_input(UserEnteredComment),
+        ],
+        model.comment,
+      ),
+    ]),
+    html.div([], [
       html.button([event.on_click(UserClickedAddComment)], [
         html.text("Kommentieren"),
       ]),
