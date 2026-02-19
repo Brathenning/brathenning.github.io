@@ -42,7 +42,7 @@ pub type Msg {
   UserEnteredName(String)
   UserEnteredComment(String)
   UserResetComment
-  UserRepliedComment(Int)
+  UserStartedReply(Int)
 }
 
 pub type Model {
@@ -100,7 +100,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
         )
       }
 
-    UserRepliedComment(id), False -> {
+    UserStartedReply(id), False -> {
       case id {
         0 -> #(
           Model(
@@ -109,11 +109,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
           ),
           effect.none(),
         )
-        _ ->
-          update(
-            Model(..model, reply_to: option.Some(id)),
-            UserClickedAddComment,
-          )
+        _ -> #(Model(..model, reply_to: option.Some(id)), effect.none())
       }
     }
 
@@ -156,7 +152,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, Effect(Msg)) {
     )
     UserEnteredName(name), False -> #(Model(..model, user: name), effect.none())
     UserResetComment, False -> #(
-      Model(..model, user: "", comment: ""),
+      Model(..model, user: "", comment: "", reply_to: option.None),
       effect.none(),
     )
 
@@ -216,7 +212,7 @@ fn enter_comment(model: Model) -> Element(Msg) {
       html.button([event.on_click(UserClickedAddComment)], [
         html.text("Kommentieren"),
       ]),
-      html.button([event.on_click(UserResetComment)], [html.text("Leer")]),
+      html.button([event.on_click(UserResetComment)], [html.text("Abbrechen")]),
     ]),
   ])
 }
@@ -259,7 +255,7 @@ fn comment_div(
       ]),
       html.div([], p_list(comment, current_top, top_name)),
 
-      html.button([event.on_click(UserRepliedComment(comment.id))], [
+      html.button([event.on_click(UserStartedReply(comment.id))], [
         html.text("Antworten"),
       ]),
     ],
