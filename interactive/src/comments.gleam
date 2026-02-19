@@ -205,6 +205,65 @@ pub fn view(model: Model) -> Element(Msg) {
   ])
 }
 
+fn outer_div_attributes(layer: Int) -> List(attribute.Attribute(Msg)) {
+  case layer {
+    0 -> []
+    _ -> [
+      attribute.styles([
+        #("margin-left", int.to_string(20) <> "px"),
+        #(
+          "border-left",
+          "6px solid "
+            <> "hsl("
+            <> int.to_string({ 0 + layer * 30 })
+            <> ", 100%, 82%)",
+        ),
+      ]),
+    ]
+  }
+}
+
+fn comment_div(
+  comment: Comment,
+  current_top: option.Option(Int),
+  top_name: String,
+) -> Element(Msg) {
+  html.div(
+    [
+      attribute.class("comment"),
+    ],
+    [
+      html.span([], [html.text(comment.by_user)]),
+      html.span([], [html.text(" - ")]),
+      html.span([], [
+        html.text(
+          timestamp.to_calendar(comment.created_at, calendar.utc_offset).0
+          |> format_date,
+        ),
+      ]),
+      {
+        case current_top {
+          option.None ->
+            html.p([attribute.style("padding", "0px")], [
+              html.text(option.unwrap(comment.content, "")),
+            ])
+          _ ->
+            html.p([], [
+              html.a([attribute.href("#")], [
+                html.text("@" <> top_name),
+              ]),
+              html.text(":\n" <> option.unwrap(comment.content, "")),
+            ])
+        }
+      },
+
+      html.button([event.on_click(UserRepliedComment(comment.id))], [
+        html.text("Antworten"),
+      ]),
+    ],
+  )
+}
+
 fn recursive_replies(
   comments_dict: dict.Dict(option.Option(Int), List(Comment)),
   current_top: option.Option(Int),
@@ -220,75 +279,27 @@ fn recursive_replies(
       Ok(current_comments) -> {
         [
           html.div(
-            {
-              case layer {
-                0 -> []
-                _ -> [
-                  attribute.styles([
-                    #("margin-left", int.to_string(20) <> "px"),
-                    #(
-                      "border-left",
-                      "6px solid "
-                        <> "hsl("
-                        <> int.to_string({ 0 + layer * 30 })
-                        <> ", 100%, 82%)",
-                    ),
-                  ]),
-                ]
-              }
-            },
+            outer_div_attributes(layer),
             list.sort(current_comments, fn(com_a, com_b) {
               timestamp.compare(com_a.created_at, com_b.created_at)
             })
               |> list.map(fn(comment) {
-                html.div(
-                  [
-                    attribute.class("comment"),
-                  ],
-                  [
-                    html.span([], [html.text(comment.by_user)]),
-                    html.span([], [html.text(" - ")]),
-                    html.span([], [
-                      html.text(
-                        timestamp.to_calendar(
-                          comment.created_at,
-                          calendar.utc_offset,
-                        ).0
-                        |> format_date,
-                      ),
-                    ]),
-                    {
-                      case current_top {
-                        option.None ->
-                          html.p([attribute.style("padding", "0px")], [
-                            html.text(option.unwrap(comment.content, "")),
-                          ])
-                        _ ->
-                          html.p([], [
-                            html.a([attribute.href("#")], [
-                              html.text("@" <> top_name),
-                            ]),
-                            html.text(
-                              ":\n" <> option.unwrap(comment.content, ""),
-                            ),
-                          ])
-                      }
-                    },
-
-                    html.button(
-                      [event.on_click(UserRepliedComment(comment.id))],
-                      [
-                        html.text("Antworten"),
-                      ],
-                    ),
-                  ]
-                    |> list.append(recursive_replies(
-                      comments_dict,
-                      option.Some(comment.id),
-                      comment.by_user,
-                      layer + 1,
-                    )),
-                )
+                case
+                  recursive_replies(
+                    comments_dict,
+                    option.Some(comment.id),
+                    comment.by_user,
+                    layer + 1,
+                  )
+                {
+                  [] -> comment_div(comment, current_top, top_name)
+                  sub_comments ->
+                    html.div(
+                      [],
+                      [comment_div(comment, current_top, top_name)]
+                        |> list.append(sub_comments),
+                    )
+                }
               }),
           ),
         ]
