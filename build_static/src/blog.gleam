@@ -98,7 +98,7 @@ fn build_feed(blog_posts: List(BlogPost)) -> rss.RssChannel {
 }
 
 fn title_page(contents: String) -> String {
-  "<!doctype html>
+  "<!doctype html lang=\"de\">
   <html>
     <head>
       <meta charset=\"utf-8\">
@@ -114,7 +114,7 @@ fn title_page(contents: String) -> String {
 }
 
 fn blog_page(contents: String) -> String {
-  "<!doctype html>
+  "<!doctype html lang=\"de\">
   <html>
     <head>
       <meta charset=\"utf-8\">
@@ -123,8 +123,9 @@ fn blog_page(contents: String) -> String {
     </head>
     <body>
       <div class=\"blog-content\">" <> contents <> "</div>
-
+      <hr/>
       <div id=\"comment\"></div>
+      <hr/>
       <div id=\"cat\"></div>
     </body>
   </html>"

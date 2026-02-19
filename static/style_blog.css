@@ -19,8 +19,13 @@ body {
 
 .comment{
   background: var(--code-bg);
-  margin: 20px 20px 20px 0px;
+  margin: 20px 0px;
   padding: 0 20px;
+}
+
+textarea{
+  width: 98%;
+  height: 50px;
 }
 
 /* 2. Typography */
