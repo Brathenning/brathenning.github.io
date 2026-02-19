@@ -231,7 +231,7 @@ fn recursive_replies(
                     #("margin-left", int.to_string(20) <> "px"),
                     #(
                       "border-left",
-                      "6px "
+                      "6px solid "
                         <> "hsl("
                         <> int.to_string({ 0 + layer * 30 })
                         <> ", 100%, 82%)",
