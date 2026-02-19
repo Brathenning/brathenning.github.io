@@ -219,14 +219,14 @@ fn enter_comment(model: Model) -> Element(Msg) {
       ),
       html.textarea(
         [
-          attribute.value(model.user),
+          attribute.value(model.comment),
           attribute.styles([
             #("width", "100%"),
             #("height", "50px"),
           ]),
           event.on_input(UserEnteredComment),
         ],
-        model.comment,
+        "",
       ),
     ]),
     html.div([], [
