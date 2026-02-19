@@ -226,7 +226,7 @@ fn enter_comment(model: Model) -> Element(Msg) {
           ]),
           event.on_input(UserEnteredComment),
         ],
-        "",
+        model.comment,
       ),
     ]),
     html.div([], [

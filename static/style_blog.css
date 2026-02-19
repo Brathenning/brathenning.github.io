@@ -3,7 +3,7 @@
   --bg: #e8befd;
   --text: #000000;
   --accent: #b71cff;
-  --code-bg: #f4f4f4;
+  --code-bg: #f0d3ff;
   --width: 700px;
 }
 
@@ -21,11 +21,18 @@ body {
   background: var(--code-bg);
   margin: 20px 0px;
   padding: 0 20px;
+  border: 2px solid #ba82ff;
 }
 
 textarea{
-  width: 98%;
-  height: 50px;
+  font-family: system-ui, -apple-system, sans-serif;
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 2px solid #ba82ff;
+  background-color: var(--code-bg);
+  resize: none;
 }
 
 /* 2. Typography */
