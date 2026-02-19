@@ -9,6 +9,7 @@ import gleam/json
 import gleam/list
 import gleam/option
 import gleam/result
+import gleam/string
 import gleam/time/calendar
 import gleam/time/timestamp
 import gleam/uri
@@ -182,6 +183,12 @@ pub fn view(model: Model) -> Element(Msg) {
         html.textarea(
           [
             event.on_input(UserEnteredComment),
+            attribute.styles({
+              [
+                #("rows", "6"),
+                #("cols", "50"),
+              ]
+            }),
           ],
           model.comment,
         ),
@@ -208,9 +215,22 @@ pub fn view(model: Model) -> Element(Msg) {
 fn outer_div_attributes(layer: Int) -> List(attribute.Attribute(Msg)) {
   case layer {
     0 -> []
+    1 -> [
+      attribute.styles([
+        #("padding-left", int.to_string(10) <> "px"),
+        #(
+          "border-left",
+          "6px solid "
+            <> "hsl("
+            <> int.to_string({ 0 + layer * 30 })
+            <> ", 100%, 82%)",
+        ),
+      ]),
+    ]
     _ -> [
       attribute.styles([
-        #("margin-left", int.to_string(20) <> "px"),
+        #("margin-left", int.to_string(10) <> "px"),
+        #("padding-left", int.to_string(10) <> "px"),
         #(
           "border-left",
           "6px solid "
@@ -241,21 +261,49 @@ fn comment_div(
           |> format_date,
         ),
       ]),
-      {
+      html.div([], {
+        let p_comments = case
+          option.unwrap(comment.content, "")
+          |> string.split_once("\n")
+        {
+          Ok(#(first, rest)) -> #(
+            first,
+            rest
+              |> string.split("\n")
+              |> list.map(fn(content_split) {
+                html.p(
+                  [
+                    attribute.styles([#("padding", "0px"), #("margin", "0px")]),
+                  ],
+                  [
+                    html.text(content_split),
+                  ],
+                )
+              }),
+          )
+          Error(_) -> #(option.unwrap(comment.content, ""), [])
+        }
         case current_top {
           option.None ->
-            html.p([attribute.style("padding", "0px")], [
-              html.text(option.unwrap(comment.content, "")),
-            ])
+            html.p(
+              [attribute.styles([#("padding", "0px"), #("margin", "0px")])],
+              [
+                html.text(p_comments.0),
+              ],
+            )
           _ ->
-            html.p([], [
-              html.a([attribute.href("#")], [
-                html.text("@" <> top_name),
-              ]),
-              html.text(":\n" <> option.unwrap(comment.content, "")),
-            ])
+            html.p(
+              [attribute.styles([#("padding", "0px"), #("margin", "0px")])],
+              [
+                html.a([attribute.href("#")], [
+                  html.text("@" <> top_name),
+                ]),
+                html.text(": " <> p_comments.0),
+              ],
+            )
         }
-      },
+        |> list.prepend(p_comments.1, _)
+      }),
 
       html.button([event.on_click(UserRepliedComment(comment.id))], [
         html.text("Antworten"),
