@@ -217,11 +217,8 @@ fn recursive_replies(
       |> dict.get(current_top)
     {
       Error(_) -> []
-      Ok(current_comments) ->
-        list.sort(current_comments, fn(com_a, com_b) {
-          timestamp.compare(com_a.created_at, com_b.created_at)
-        })
-        |> list.map(fn(comment) {
+      Ok(current_comments) -> {
+        [
           html.div(
             {
               case layer {
@@ -240,8 +237,10 @@ fn recursive_replies(
                 ]
               }
             },
-            list.append(
-              [
+            list.sort(current_comments, fn(com_a, com_b) {
+              timestamp.compare(com_a.created_at, com_b.created_at)
+            })
+              |> list.map(fn(comment) {
                 html.div(
                   [
                     attribute.class("comment"),
@@ -282,18 +281,18 @@ fn recursive_replies(
                         html.text("Antworten"),
                       ],
                     ),
-                  ],
-                ),
-              ],
-              recursive_replies(
-                comments_dict,
-                option.Some(comment.id),
-                comment.by_user,
-                layer + 1,
-              ),
-            ),
-          )
-        })
+                  ]
+                    |> list.append(recursive_replies(
+                      comments_dict,
+                      option.Some(comment.id),
+                      comment.by_user,
+                      layer + 1,
+                    )),
+                )
+              }),
+          ),
+        ]
+      }
     }
   }
 }
